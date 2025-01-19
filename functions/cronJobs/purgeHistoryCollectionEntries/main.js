@@ -27,16 +27,9 @@ export default async ({ req, res, log, error }) => {
 
     log(`Deleting documents older than: ${oneWeekAgo.toISOString()}`);
 
-    const query = [
-      sdk.Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
-    ];
-    log(`Query: ${JSON.stringify(query)}`);
-
-    const documents = await databases.listDocuments(
-      databaseId,
-      collectionId,
-      query
-    );
+    const documents = await databases.listDocuments(databaseId, collectionId, [
+      Query.lessThanEqual('$createdAt', oneWeekAgo.toISOString()),
+    ]);
 
     log(`Documents fetched: ${documents.total}`);
 
