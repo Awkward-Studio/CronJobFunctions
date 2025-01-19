@@ -31,6 +31,7 @@ export default async ({ req, res, log, error }) => {
       collectionId,
       query
     );
+    log(`Deleted document with ID: ${documents}`);
 
     if (documents.total === 0) {
       return res.json({
