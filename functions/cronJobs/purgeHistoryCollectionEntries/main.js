@@ -30,10 +30,7 @@ export default async ({ req, res, log, error }) => {
       const documents = await databases.listDocuments(
         databaseId,
         collectionId,
-        [
-          Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
-          Query.limit(100), // Appwrite's maximum limit per request
-        ]
+        [Query.lessThanEqual('$createdAt', oneWeekAgo.toISOString())]
       );
 
       if (documents.total === 0) {
