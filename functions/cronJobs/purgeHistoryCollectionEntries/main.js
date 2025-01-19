@@ -1,61 +1,58 @@
 import { Client, Databases } from 'node-appwrite';
 
 export default async ({ req, res, log, error }) => {
+  log('Function execution started.');
+
   try {
-    // Initialize the Appwrite client
     const client = new Client()
       .setEndpoint(process.env.APPWRITE_FUNCTION_API_ENDPOINT)
       .setProject(process.env.APPWRITE_FUNCTION_PROJECT_ID)
       .setKey(process.env.APPWRITE_API_KEY);
 
-    const databases = new Databases(client);
+    log('Appwrite client initialized.');
 
-    // Extract database and collection IDs from environment variables
+    const databases = new Databases(client);
     const databaseId = process.env.APPWRITE_FUNCTION_DATABASE_ID;
     const collectionId = process.env.APPWRITE_FUNCTION_COLLECTION_ID;
 
     if (!databaseId || !collectionId) {
-      throw new Error(
-        'Missing database or collection ID in environment variables.'
-      );
+      log('Missing environment variables.');
+      throw new Error('Database ID or Collection ID is missing.');
     }
 
-    // Get the current date and calculate one week ago
+    log(`Database ID: ${databaseId}, Collection ID: ${collectionId}`);
+
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    // Query for documents older than a week
+    log(`Deleting documents older than: ${oneWeekAgo.toISOString()}`);
+
     const query = [`$createdAt<=${oneWeekAgo.toISOString()}`];
+    log(`Query: ${JSON.stringify(query)}`);
+
     const documents = await databases.listDocuments(
       databaseId,
       collectionId,
       query
     );
-    context.log(`Deleted document with ID: ${documents}`);
+
+    log(`Documents fetched: ${documents.total}`);
 
     if (documents.total === 0) {
-      return res.json({
-        message: 'No documents older than a week were found.',
-      });
+      log('No documents found to delete.');
+      return res.json({ message: 'No documents older than a week found.' });
     }
 
-    // Delete each document
     for (const document of documents.documents) {
       await databases.deleteDocument(databaseId, collectionId, document.$id);
-      context.log(`Deleted document with ID: ${document.$id}`);
+      log(`Deleted document with ID: ${document.$id}`);
     }
 
-    return res.json({
-      message: `${documents.total} document(s) deleted successfully.`,
-    });
+    log('All matching documents deleted successfully.');
+    return res.json({ message: `${documents.total} document(s) deleted.` });
   } catch (err) {
-    error(err.message);
-    return res.json(
-      {
-        error: 'An error occurred while cleaning up old documents.',
-        details: err.message,
-      },
-      500
-    );
+    error('Error occurred during function execution:', err.message);
+    log(`Error details: ${err.stack}`);
+    return res.json({ error: err.message }, 500);
   }
 };
