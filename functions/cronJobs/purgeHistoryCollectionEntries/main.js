@@ -31,7 +31,7 @@ export default async ({ req, res, log, error }) => {
       collectionId,
       query
     );
-    log(`Deleted document with ID: ${documents}`);
+    context.log(`Deleted document with ID: ${documents}`);
 
     if (documents.total === 0) {
       return res.json({
@@ -42,7 +42,7 @@ export default async ({ req, res, log, error }) => {
     // Delete each document
     for (const document of documents.documents) {
       await databases.deleteDocument(databaseId, collectionId, document.$id);
-      log(`Deleted document with ID: ${document.$id}`);
+      context.log(`Deleted document with ID: ${document.$id}`);
     }
 
     return res.json({
