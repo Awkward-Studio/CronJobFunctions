@@ -1,4 +1,4 @@
-import { Client, Databases } from 'node-appwrite';
+import { Client, Databases, Query } from 'node-appwrite';
 
 export default async ({ req, res, log, error }) => {
   log('Function execution started.');
@@ -27,7 +27,9 @@ export default async ({ req, res, log, error }) => {
 
     log(`Deleting documents older than: ${oneWeekAgo.toISOString()}`);
 
-    const query = [`$createdAt<=${oneWeekAgo.toISOString()}`];
+    const query = [
+      Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
+    ];
     log(`Query: ${JSON.stringify(query)}`);
 
     const documents = await databases.listDocuments(
