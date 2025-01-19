@@ -15,7 +15,9 @@ export default async ({ req, res, log, error }) => {
     const collectionId = process.env.APPWRITE_FUNCTION_COLLECTION_ID;
 
     if (!databaseId || !collectionId) {
-      throw new Error("Missing database or collection ID in environment variables.");
+      throw new Error(
+        'Missing database or collection ID in environment variables.'
+      );
     }
 
     // Get the current date and calculate one week ago
@@ -23,12 +25,16 @@ export default async ({ req, res, log, error }) => {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
     // Query for documents older than a week
-    const query = [`createdAt<=${oneWeekAgo.toISOString()}`];
-    const documents = await databases.listDocuments(databaseId, collectionId, query);
+    const query = [`$createdAt<=${oneWeekAgo.toISOString()}`];
+    const documents = await databases.listDocuments(
+      databaseId,
+      collectionId,
+      query
+    );
 
     if (documents.total === 0) {
       return res.json({
-        message: "No documents older than a week were found.",
+        message: 'No documents older than a week were found.',
       });
     }
 
@@ -43,9 +49,12 @@ export default async ({ req, res, log, error }) => {
     });
   } catch (err) {
     error(err.message);
-    return res.json({
-      error: "An error occurred while cleaning up old documents.",
-      details: err.message,
-    }, 500);
+    return res.json(
+      {
+        error: 'An error occurred while cleaning up old documents.',
+        details: err.message,
+      },
+      500
+    );
   }
 };
