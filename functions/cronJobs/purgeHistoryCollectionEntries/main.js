@@ -25,7 +25,7 @@ export default async ({ req, res, log, error }) => {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
     // Query for documents older than a week
-    const query = [`$createdAt<=${oneWeekAgo.toISOString()}`];
+    const query = [`$createdAt<=${JSON.stringify(oneWeekAgo.toISOString())}`];
     const documents = await databases.listDocuments(
       databaseId,
       collectionId,
