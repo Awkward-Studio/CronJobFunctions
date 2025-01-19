@@ -23,7 +23,7 @@ export default async ({ req, res, log, error }) => {
     log(`Database ID: ${databaseId}, Collection ID: ${collectionId}`);
 
     const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 2);
 
     log(`Deleting documents older than: ${oneWeekAgo.toISOString()}`);
 
