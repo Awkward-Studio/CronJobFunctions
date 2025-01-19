@@ -1,6 +1,8 @@
 import { Client, Databases, Query } from 'node-appwrite';
 
 export default async ({ req, res, log, error }) => {
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)); // Helper to add delay
+
   try {
     log('Function execution started.');
 
@@ -27,10 +29,14 @@ export default async ({ req, res, log, error }) => {
     // Loop to fetch and delete documents in batches
     while (true) {
       // Fetch a batch of documents
+      const query = [
+        Query.lessThanEqual('$createdAt', oneWeekAgo.toISOString()),
+        Query.limit(100), // Appwrite's maximum limit per request
+      ];
       const documents = await databases.listDocuments(
         databaseId,
         collectionId,
-        [Query.lessThanEqual('$createdAt', oneWeekAgo.toISOString())]
+        query
       );
 
       if (documents.total === 0) {
@@ -45,6 +51,9 @@ export default async ({ req, res, log, error }) => {
         await databases.deleteDocument(databaseId, collectionId, document.$id);
         log(`Deleted document with ID: ${document.$id}`);
         totalDeleted++;
+
+        // Add a delay to prevent hitting the rate limit
+        await sleep(2000); // 200ms delay between deletions
       }
     }
 
