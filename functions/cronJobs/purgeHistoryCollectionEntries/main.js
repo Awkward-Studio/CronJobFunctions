@@ -28,7 +28,7 @@ export default async ({ req, res, log, error }) => {
     log(`Deleting documents older than: ${oneWeekAgo.toISOString()}`);
 
     const query = [
-      Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
+      sdk.Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
     ];
     log(`Query: ${JSON.stringify(query)}`);
 
