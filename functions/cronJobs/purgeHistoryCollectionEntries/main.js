@@ -27,14 +27,13 @@ export default async ({ req, res, log, error }) => {
     // Loop to fetch and delete documents in batches
     while (true) {
       // Fetch a batch of documents
-      const query = [
-        Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
-        Query.limit(100), // Appwrite's maximum limit per request
-      ];
       const documents = await databases.listDocuments(
         databaseId,
         collectionId,
-        query
+        [
+          Query.lessThanOrEqual('$createdAt', oneWeekAgo.toISOString()),
+          Query.limit(100), // Appwrite's maximum limit per request
+        ]
       );
 
       if (documents.total === 0) {
